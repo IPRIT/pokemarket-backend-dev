@@ -9,12 +9,15 @@ const groups = {
   },
   locked: {
     mask: 0x10,
-    name: 'Locked'
+    name: 'Locked'  
   }
 };
 
 let utils = {
-  resolveGroup: group => group.mask ? group : Number.isInteger(group) ? utils.groupByMask(group) : groups[ group ],
+  resolveGroup: group => group.mask 
+    ? group : Number.isInteger(group) ? utils.groupByMask(group) : groups[ group ],
+  
+  resolveAllGroups: (...groups) => groups.map(utils.resolveGroup),
 
   hasRight: (group, mask) => (mask & utils.resolveGroup( group ).mask) === utils.resolveGroup( group ).mask,
   

@@ -23,6 +23,7 @@ let User = sequelize.define('User', {
   nickname: {
     type: Sequelize.STRING,
     allowNull: true,
+    unique: true,
     validate: {
       // a) allows words where first and last symbols are always alphanumeric;
       // b) allow to use underscores, points & hyphens no more then 1 time in a row
@@ -30,7 +31,7 @@ let User = sequelize.define('User', {
     }
   },
   googleId: {
-    type: Sequelize.BIGINT,
+    type: Sequelize.STRING,
     allowNull: true
   },
   facebookId: {
@@ -69,6 +70,9 @@ let User = sequelize.define('User', {
   setterMethods: {
     fullname: function (value) {
       var names = (value || "").trim().split(/\s+/);
+      while (names.length !== 2) {
+        names.push('-');
+      }
       this.setDataValue('firstname', names.slice(0, -1).join(' '));
       this.setDataValue('lastname', names.slice(-1).join(' '));
     }
