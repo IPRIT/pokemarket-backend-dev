@@ -1,6 +1,6 @@
 import { User } from '../../../../models';
-import Promise from 'bluebird';
 import Log from 'log4js';
+import { rememberUser } from "../session-manager";
 
 const log = Log.getLogger('models');
 
@@ -8,10 +8,11 @@ export default (req, res, next) => {
   let googleUser = req.googleUser;
 
   getOrCreateUser(googleUser).then(user => {
-    //todo:
-    res.json(
-      user.get({ raw: true })
-    );
+    return rememberUser(user);
+  }).then(tokenInstance => {
+    res.json({
+      token: tokenInstance.token
+    });
   }).catch(err => next(err));
 };
 

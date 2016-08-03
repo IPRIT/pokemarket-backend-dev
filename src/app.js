@@ -7,6 +7,7 @@ import bodyParser from 'body-parser';
 import session from 'express-session';
 import formData from 'express-form-data';
 import apiRouter from './route';
+import config from './utils/config';
 import test from './just-for-test';
 
 let app = express();
@@ -17,10 +18,10 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(formData.parse());
 app.use(formData.stream());
 app.use(formData.union());
-app.use(cookieParser());
+app.use(cookieParser(config.cookieSecret));
 app.enable('trust proxy');
 app.use(session({
-  secret: 'keyboard cat offset',
+  secret: config.sessionSecret, //'keyboard cat offset',
   resave: false,
   saveUninitialized: true
 }));

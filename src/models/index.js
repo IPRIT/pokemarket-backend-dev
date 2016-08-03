@@ -1,6 +1,7 @@
 import Log from 'log4js';
 import sequelize from './sequelize';
 import User from './User';
+import AuthToken from './AuthToken';
 
 const log = Log.getLogger('models');
 
@@ -11,4 +12,11 @@ sequelize.sync().then(() => {
   log.fatal('Error:', err);
 });
 
-export { User };
+/**
+ * Define relatives between models
+ */
+User.hasMany(AuthToken, { foreignKey: 'userUuid', targetKey: 'uuid' });
+
+
+
+export { User, AuthToken };

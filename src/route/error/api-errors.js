@@ -1,7 +1,7 @@
 const defaultErrorMessage = 'Unknown error';
 
 export function ClientError(err, req, res, next) {
-  console.log('Client Error');
+  console.error('Client Error', err);
   if (err.message) {
     res.status(400).json({
       error: err && err.message || defaultErrorMessage
