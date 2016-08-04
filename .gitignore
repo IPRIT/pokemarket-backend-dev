@@ -4,4 +4,4 @@
 .idea
 node_modules
 config.development.json
-config.json
+# config.json
