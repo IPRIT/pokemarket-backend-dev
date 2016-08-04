@@ -46,6 +46,10 @@ let User = sequelize.define('User', {
     type: Sequelize.INTEGER,
     defaultValue: 100
   },
+  balance: {
+    type: Sequelize.FLOAT,
+    defaultValue: 0
+  },
   accessGroup: {
     type: Sequelize.INTEGER,
     defaultValue: userGroups.groups.user.mask,
@@ -85,6 +89,10 @@ let User = sequelize.define('User', {
     name: 'social_profiles_index',
     method: 'BTREE',
     fields: [ 'googleId', 'facebookId' ]
+  }, {
+    name: 'email_index',
+    method: 'BTREE',
+    fields: [ 'email' ]
   }],
   defaultScope: function () {
     let lockedGroup = userGroups.groups.locked;
@@ -121,6 +129,14 @@ let User = sequelize.define('User', {
           }
         }
       }
+    }
+  },
+  instanceMethods: {
+    hasRight: function (mask) {
+      return userGroups.utils.hasRight(
+        this.accessGroup,
+        mask
+      );
     }
   }
 });

@@ -1,5 +1,8 @@
 'use strict';
 
+import { HttpError } from './utils/http-error';
+global.HttpError = HttpError;
+
 import express from 'express';
 import morgan from 'morgan';
 import cookieParser from 'cookie-parser';

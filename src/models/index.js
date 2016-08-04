@@ -17,6 +17,4 @@ sequelize.sync().then(() => {
  */
 User.hasMany(AuthToken, { foreignKey: 'userUuid', targetKey: 'uuid' });
 
-
-
 export { User, AuthToken };

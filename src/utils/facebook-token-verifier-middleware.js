@@ -12,7 +12,7 @@ export default function (req, res, next) {
   //Bluebird's promisify fn works incorrectly for the fb.api. Returning to callbacks hell...(37%)
   fb.api('me', { fields: ['id', 'name', 'email'], access_token: accessToken }, facebookUser => {
     if (!isFacebookUserLike(facebookUser)) {
-      return next(new Error('Facebook\'s user is not presented'));
+      return next(new HttpError('Facebook\'s user is not presented'));
     }
     deap.merge(req, { facebookUser });
     next();

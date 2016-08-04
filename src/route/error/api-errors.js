@@ -1,10 +1,10 @@
 const defaultErrorMessage = 'Unknown error';
 
 export function ClientError(err, req, res, next) {
-  console.error('Client Error', err);
-  if (err.message) {
-    res.status(400).json({
-      error: err && err.message || defaultErrorMessage
+  if (err.httpCode) { // it's HttpError object
+    console.error('Client Error', err); //todo: remove in production
+    res.status(err.httpCode).json({
+      error: err
     });
   } else {
     next(err);
@@ -12,11 +12,15 @@ export function ClientError(err, req, res, next) {
 }
 
 export function ApiError(err, req, res, next) {
-  console.log('Server Error');
+  console.error('Server Error', err);
   if (res.headersSent) {
     return next(err);
   }
   res.status(500).json({
-    error: defaultErrorMessage
+    error: {
+      message: err && err.message || defaultErrorMessage,
+      httpCode: 500,
+      restParams: err.restParams || {}
+    }
   });
 }

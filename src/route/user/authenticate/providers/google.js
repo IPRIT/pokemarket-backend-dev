@@ -2,7 +2,7 @@ import { User } from '../../../../models';
 import Log from 'log4js';
 import { rememberUser } from "../session-manager";
 
-const log = Log.getLogger('models');
+const log = Log.getLogger('Google Auth');
 
 export default (req, res, next) => {
   let googleUser = req.googleUser;
@@ -17,18 +17,24 @@ export default (req, res, next) => {
 };
 
 function getOrCreateUser(googleUser) {
-  let { sub } = googleUser;
+  let { sub, email } = googleUser;
 
   return User.findOne({
     where: {
-      googleId: sub
+      $or: {
+        email,
+        googleId: sub
+      }
     }
   }).then(user => {
-    log.info('Got user:\t', user && user.get({raw: true}).email);
     if (!user) {
       return createUser( googleUser );
     }
-    return user;
+    log.info('Got user:\t', user && user.get({plain: true}).email);
+    if (!user.googleId) {
+      user.googleId = sub;
+    }
+    return user.save();
   });
 }
 

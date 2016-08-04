@@ -15,7 +15,7 @@ export default function (req, res, next) {
 
   checkTokenId(tokenId, clientId).then(googleUser => {
     if (!isGoogleUserLike(googleUser)) {
-      throw new Error('Google\'s user is not presented');
+      throw new HttpError('Google\'s user is not presented');
     }
     deap.merge(req, { googleUser });
     next();

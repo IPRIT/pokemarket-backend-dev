@@ -1,5 +1,7 @@
 import Sequelize from 'sequelize';
 import sequelize from '../sequelize';
+import User from '../User';
+import deap from 'deap';
 
 let AuthToken = sequelize.define('AuthToken', {
   id: {
@@ -33,10 +35,21 @@ let AuthToken = sequelize.define('AuthToken', {
     };
   },
   scopes: {
-    inActive: {
+    inactive: {
       where: {
         isActive: false
       }
+    }
+  },
+  instanceMethods: {
+    getUser: function (options = {}) {
+      let defaultOptions = {
+        where: {
+          uuid: this.userUuid
+        }
+      };
+      deap.extend(options, defaultOptions);
+      return User.findOne(options);
     }
   }
 });

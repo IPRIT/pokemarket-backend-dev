@@ -10,6 +10,10 @@ const groups = {
   locked: {
     mask: 0x10,
     name: 'Locked'  
+  },
+  all: {
+    mask: 0x1000 | 0x100 | 0x10,
+    name: 'All'
   }
 };
 
@@ -28,14 +32,18 @@ let utils = {
   removeGroup: (mask, group) => mask ^ utils.resolveGroup( group ).mask,
   
   groupByMask: mask => {
+    if (mask === groups.all.mask) {
+      return groups.all;
+    }
     let filteredGroups = utils.groupsByMask(mask);
     if (!filteredGroups.length) {
-      throw new Error('Group not found');
+      throw new HttpError('Group not found');
     }
     return filteredGroups[0];
   },
   
   groupsByMask: mask => Object.keys(groups)
+    .filter(groupKey => groupKey !== 'all')
     .filter(groupKey => utils.hasRight(groupKey, mask))
     .map(groupKey => groups[ groupKey ]),
   
@@ -48,7 +56,7 @@ let utils = {
   maxGroupByMask: mask => {
     let filteredGroups = utils.groupsByMaskSorted(mask);
     if (!filteredGroups.length) {
-      throw new Error('Group not found');
+      throw new HttpError('Group not found');
     }
     return filteredGroups[0];
   },
@@ -56,7 +64,7 @@ let utils = {
   minGroupByMask: mask => {
     let filteredGroups = utils.groupsByMaskSorted(mask, 'asc');
     if (!filteredGroups.length) {
-      throw new Error('Group not found');
+      throw new HttpError('Group not found');
     }
     return filteredGroups[0];
   }
