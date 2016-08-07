@@ -18,7 +18,7 @@ export function ApiError(err, req, res, next) {
   }
   res.status(500).json({
     error: {
-      message: err && err.message || defaultErrorMessage,
+      description: err && err.message || defaultErrorMessage,
       httpCode: 500,
       restParams: err.restParams || {}
     }

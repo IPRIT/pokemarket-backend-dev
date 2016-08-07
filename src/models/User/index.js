@@ -93,6 +93,10 @@ let User = sequelize.define('User', {
     name: 'email_index',
     method: 'BTREE',
     fields: [ 'email' ]
+  }, {
+    name: 'nickname_index',
+    type: 'FULLTEXT',
+    fields: [ 'nickname' ]
   }],
   defaultScope: function () {
     let lockedGroup = userGroups.groups.locked;

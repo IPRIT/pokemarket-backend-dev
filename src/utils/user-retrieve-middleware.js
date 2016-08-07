@@ -1,6 +1,6 @@
 import { User, AuthToken } from '../models';
 
-export default (req, res, next) => {
+export default async (req, res, next) => {
   if (req.user) {
     //todo: remove in production (this case is only for assertion)
     return next(new HttpError('The user already exists'));
@@ -15,20 +15,19 @@ export default (req, res, next) => {
     }
     req.user = user;
     next();
-  }).catch(err => next(err));
+  }).catch(next);
 };
 
-function getUser(token) {
-  return AuthToken.findOne({
+async function getUser(token) {
+  let tokenInstance = await AuthToken.findOne({
     where: { token }
-  }).then(token => {
-    if (!token) {
-      return null; // because it's required by our middleware fn
+  });
+  if (!tokenInstance) {
+    return null;
+  }
+  return tokenInstance.getUser({
+    attributes: {
+      exclude: [ 'deletedAt' ]
     }
-    return token.getUser({
-      attributes: {
-        exclude: [ 'deletedAt' ]
-      }
-    })
   });
 }

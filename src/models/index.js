@@ -2,6 +2,7 @@ import Log from 'log4js';
 import sequelize from './sequelize';
 import User from './User';
 import AuthToken from './AuthToken';
+import Pokemon from './Pokemon';
 
 const log = Log.getLogger('models');
 
@@ -17,4 +18,4 @@ sequelize.sync().then(() => {
  */
 User.hasMany(AuthToken, { foreignKey: 'userUuid', targetKey: 'uuid' });
 
-export { User, AuthToken };
+export { User, AuthToken, Pokemon };

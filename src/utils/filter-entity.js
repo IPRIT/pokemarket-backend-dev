@@ -16,6 +16,10 @@ function filterByAttributes(obj, attrs) {
     exclude = attrs.exclude || [];
   } else if (Array.isArray(attrs)) {
     include = attrs;
+  } else if (typeof attrs === 'string') {
+    include = attrs.split(',');
+  } else {
+    return obj;
   }
   let newObj = {};
   if (include.length) {
