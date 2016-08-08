@@ -11,9 +11,8 @@ function isGoogleUserLike(obj) {
 export default function (req, res, next) {
   let tokenId = req.body.tokenId;
   let clientId = config.google.clientId;
-  let checkTokenId = Promise.promisify(verifier.verify);
 
-  checkTokenId(tokenId, clientId).then(googleUser => {
+  Promise.promisify(verifier.verify)(tokenId, clientId).then(googleUser => {
     if (!isGoogleUserLike(googleUser)) {
       throw new HttpError('Google\'s user is not presented');
     }

@@ -2,19 +2,25 @@ import express from 'express';
 
 const router = express.Router();
 
-function es6(req, res, next) {
-  req.es6 = ' with es6';
-  next();
-}
-
-router.get('/', es6, (req, res) => {
-  res.end(`Works${req.es6}`);
-});
-
-router.route('/test').get(es6, (req, res) => {
-    res.end(`Works${req.es6}`);
-  }).post(es6, (req, res) => {
-    res.end(`Works${req.es6} (post)`);
+router.get('/', (req, res) => {
+  var options = {
+    root: __dirname,
+    dotfiles: 'deny',
+    headers: {
+      'x-timestamp': Date.now(),
+      'x-sent': true
+    }
+  };
+  let fileName = 'index.html';
+  res.sendFile(fileName, options, function (err) {
+    if (err) {
+      console.log(err);
+      res.status(err.status).end();
+    }
+    else {
+      console.log('Sent:', fileName);
+    }
   });
+});
 
 export default router;

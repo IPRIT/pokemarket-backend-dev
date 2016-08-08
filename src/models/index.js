@@ -7,7 +7,7 @@ import Pokemon from './Pokemon';
 const log = Log.getLogger('models');
 
 log.info('Models syncing...');
-sequelize.sync().then(() => {
+sequelize.sync(/*{ force: true }*/).then(() => {
   log.info('Models synced!');
 }).catch(err => {
   log.fatal('Error:', err);

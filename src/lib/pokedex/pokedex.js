@@ -2,21 +2,32 @@ import Promise from 'bluebird';
 import request from 'request-promise';
 import deap from 'deap';
 import { Pokemon } from '../../models';
-import { filterEntity as filter } from '../../utils';
+import { filterEntity as filter } from '../../utils';import Log from 'log4js';
 
+const log = Log.getLogger('Pokedex scanner');
 const API_URI_BASE = 'http://pokeapi.co/api/v2';
+let isActive = false;
+let activeTimeout;
 
 export function scanPokemons(options = { force: false }) {
+  if (isActive) {
+    return Promise.reject(new Error('Task is still running'));
+  }
+  isActive = true;
+  activeTimeout = setTimeout(() => isActive = false, 1000 * 30 * 60);
   let concurrency = 40;
   return getPokemons().delay(1000).map(async (pokemonMetaInfo, pokemonIndex) => {
     let existPokemon = await Pokemon.getByName(pokemonMetaInfo && pokemonMetaInfo.name);
     if (existPokemon && !options.force) {
-      console.log(`A pokemon "${pokemonMetaInfo.name}" already exists.`);
-      return Promise.resolve(existPokemon.get({ plain: true })).delay(200);
+      log.debug(`A pokemon "${pokemonMetaInfo.name}" (id: ${pokemonMetaInfo.url.match(/(\d+)\/$/i)[1]}) already exists.`);
+      return Promise.resolve().delay(500);
     }
-    console.log(`Encountering pokemon ${pokemonMetaInfo.name} (id: ${pokemonMetaInfo.url.match(/(\d+)\/$/i)[1]}) (index: ${pokemonIndex + 1})...`);
+    log.debug(`Encountering pokemon ${pokemonMetaInfo.name} (id: ${pokemonMetaInfo.url.match(/(\d+)\/$/i)[1]}) (index: ${pokemonIndex + 1})...`);
     let pokemonInfo = await getRequest(pokemonMetaInfo.url).delay(300);
-    console.log(`Got a pokemon ${pokemonMetaInfo.name} (id: ${pokemonMetaInfo.url.match(/(\d+)\/$/i)[1]}) (index: ${pokemonIndex + 1})...`);
+    if (!pokemonInfo) {
+      return Promise.resolve().delay(500);
+    }
+    log.debug(`Got a pokemon ${pokemonMetaInfo.name} (id: ${pokemonMetaInfo.url.match(/(\d+)\/$/i)[1]}) (index: ${pokemonIndex + 1})...`);
     let filteredPokemonInfo = filter(pokemonInfo, { include: [
       'name', 'height', 'weight', 'id', 'base_experience'
     ] });
@@ -34,13 +45,16 @@ export function scanPokemons(options = { force: false }) {
       )
     });
     await (!!existPokemon ? updatePokemon.bind(null, existPokemon) : savePokemon)(filteredPokemonInfo);
-    return filteredPokemonInfo;
-  }, { concurrency }).call('sort', (a, b) => a.id - b.id);
+    return Promise.resolve().delay(500);
+  }, { concurrency }).then(() => {
+    isActive = false;
+    clearTimeout(activeTimeout);
+  });
 }
 
 async function getPokemons(options = { limit: 1000, offset: 0 }) {
   let apiEndpointUri = '/pokemon';
-  console.log('Fetching pokemons...');
+  log.debug('Fetching pokemons...');
   let apiResult = await getRequest(apiEndpointUri, options);
   return apiResult.results;
 }
@@ -52,7 +66,7 @@ function savePokemon(pokemonInfo) {
 }
 
 function updatePokemon(pokemonInstance, pokemonInfo) {
-  console.log(`Updating pokemon "${pokemonInfo.name}"...`);
+  log.debug(`Updating pokemon "${pokemonInfo.name}"...`);
   return pokemonInstance.update(pokemonInfo).catch(err => {
     console.error('Unable to update a pokemon:', err);
   });
