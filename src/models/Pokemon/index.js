@@ -1,5 +1,7 @@
 import Sequelize from 'sequelize';
 import sequelize from '../sequelize';
+import Promise from 'bluebird';
+import deap from 'deap';
 
 let Pokemon = sequelize.define('Pokemon', {
   uuid: {
@@ -64,6 +66,35 @@ let Pokemon = sequelize.define('Pokemon', {
       return Pokemon.findOne({
         where: { name }
       });
+    },
+    search(params = {}) {
+      let defaultParams = {
+        offset: 0,
+        count: 20,
+        q: ''
+      };
+      deap.merge(params, defaultParams);
+      if (typeof params.q !== 'string') {
+        throw new HttpError('Search string cannot be an empty');
+      }
+      let q = params.q;
+      let options = {
+        where: {
+          $or: {
+            name: {
+              $like: `%${q.trim()}%`
+            },
+            types: {
+              $like: `%${q.trim()}%`
+            },
+            id: q.trim()
+          }
+        },
+        order: [ 'id' ],
+        limit: params.count,
+        offset: params.offset
+      };
+      return Pokemon.findAndCountAll(options);
     }
   }
 });

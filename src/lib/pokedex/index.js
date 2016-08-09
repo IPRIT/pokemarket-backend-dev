@@ -1,3 +1,3 @@
-import pokedex from './pokedex';
+import { scanPokemons } from './pokedex';
 
-export { pokedex };
+export { scanPokemons };

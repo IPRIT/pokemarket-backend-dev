@@ -1,4 +1,4 @@
-import { scanPokemons } from "../../../lib/pokedex/pokedex";
+import { scanPokemons } from "../../../lib/pokedex";
 import Log from 'log4js';
 
 const log = Log.getLogger('Pokedex scanner');
