@@ -27,7 +27,7 @@ let Lot = sequelize.define('Lot', {
 }, {
   paranoid: true,
 
-  engine: 'MYISAM',
+  engine: 'INNODB',
 
   indexes: [{
     name: 'token_index',
