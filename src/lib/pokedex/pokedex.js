@@ -14,7 +14,7 @@ export function scanPokemons(options = { force: false }) {
     return Promise.reject(new Error('Task is still running'));
   }
   isActive = true;
-  activeTimeout = setTimeout(() => isActive = false, 1000 * 30 * 60);
+  activeTimeout = setTimeout(() => isActive = false, 1000 * 30 * 60); // 30 minutes for timeout
   let concurrency = 40;
   return getPokemons().delay(1000).map(async (pokemonMetaInfo, pokemonIndex) => {
     let existPokemon = await Pokemon.getByName(pokemonMetaInfo && pokemonMetaInfo.name);
@@ -36,13 +36,13 @@ export function scanPokemons(options = { force: false }) {
     deap.extend(filteredPokemonInfo, {
       image: pokemonInfo.sprites && (
         pokemonInfo.sprites.front_default
-        || pokemonInfo.front_female
+        || pokemonInfo.sprites.front_female
         || pokemonInfo.sprites.front_shiny
-        || pokemonInfo.front_shiny_female
+        || pokemonInfo.sprites.front_shiny_female
       ),
       types: pokemonInfo.types && (
         pokemonInfo.types.map(typeEntity => typeEntity.type.name)
-      )
+      ) || []
     });
     await (!!existPokemon ? updatePokemon.bind(null, existPokemon) : savePokemon)(filteredPokemonInfo);
     return Promise.resolve().delay(500);
