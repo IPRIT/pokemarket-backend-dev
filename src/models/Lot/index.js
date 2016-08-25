@@ -12,32 +12,24 @@ let Lot = sequelize.define('Lot', {
     type: Sequelize.ENUM,
     values: [ 'sell', 'buy' ]
   },
-  states: {
-    type: Sequelize.ENUM,
-    values: [ 'sent_request', '', '', '', '', '', '' ]
-  },
-  isActive: {
-    type: Sequelize.BOOLEAN,
-    defaultValue: true
-  },
   expired: {
-    type: Sequelize.DATETIME,
+    type: Sequelize.DATE,
     allowNull: false
+  },
+  isLocked: {
+    type: Sequelize.BOOLEAN,
+    defaultValue: false
   }
 }, {
   paranoid: true,
-
   engine: 'INNODB',
-
-  indexes: [{
-    name: 'token_index',
-    method: 'BTREE',
-    fields: [ 'token' ]
-  }],
-  scopes: {
-    active: {
-      where: {
-        isActive: false
+  defaultScope: {
+    where: {
+      $and: {
+        isLocked: false,
+        expired: {
+          $gt: () => new Date()
+        }
       }
     }
   }
